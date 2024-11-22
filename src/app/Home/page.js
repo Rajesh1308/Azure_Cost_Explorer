@@ -26,7 +26,8 @@ export default function Home() {
     'Internet of Things',
     'Databases',
     'Data',
-    'AI + Machine Learning'
+    'AI + Machine Learning',
+    'Management and Governance'
   ];
 
   const savingsPlanOptions = [

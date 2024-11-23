@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Azure Cost Explorer
+
+A web application that helps users explore and analyze Azure service pricing efficiently.
+
+## Features
+
+- Real-time Azure pricing data
+- Interactive cost comparison tools
+- User-friendly interface for service exploration
+- Detailed pricing breakdowns by region and service tier
 
 ## Getting Started
 
-First, run the development server:
+### Option 1: Running with npm
 
+1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd azure-cost-explorer
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. Run the development server
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Learn More
+### Option 2: Running with Docker
 
-To learn more about Next.js, take a look at the following resources:
+1. Build the Docker image
+```bash
+docker build -t azure-cost-explorer .
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Run the container
+```bash
+docker run -p 3000:3000 azure-cost-explorer
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Access the application at [http://localhost:3000](http://localhost:3000)
 
-## Deploy on Vercel
+## Usage
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Launch the application
+2. Browse through available Azure services
+3. Compare pricing across different regions and tiers
+4. Get detailed cost breakdowns for your selected configurations
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack
+
+- Next.js
+- React
+- Tailwind CSS
+- Azure Pricing API
+
+## Note
+
+Prices and availability are subject to change. Please refer to the official Azure pricing page for the most current information.

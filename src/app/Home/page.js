@@ -17,6 +17,8 @@ export default function Home() {
     type: '',
     savingsPlan: ''
   });
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [isCompareMode, setIsCompareMode] = useState(false);
 
   // Predefined service families
   const serviceFamilies = [
@@ -71,6 +73,22 @@ export default function Home() {
     });
     setSelectedFamily('all');
     setSelectedSavingsPlan('all');
+    setSelectedRows([]);
+    setIsCompareMode(false);
+  };
+
+  const handleRowSelect = (item, serialNumber) => {
+    setSelectedRows(prev => {
+      if (prev.some(row => row.serialNumber === serialNumber)) {
+        return prev.filter(row => row.serialNumber !== serialNumber);
+      }
+      return [...prev, { ...item, serialNumber }];
+    });
+  };
+
+  const handleCompare = () => {
+    setSelectedRows(prev => [...prev].sort((a, b) => a.serialNumber - b.serialNumber));
+    setIsCompareMode(true);
   };
 
   useEffect(() => {
@@ -111,17 +129,17 @@ export default function Home() {
 
   return (
     <div className="p-4 bg-blue-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-blue-700 text-center mt-6 mb-8">
+      <h1 className="text-3xl font-bold text-blue-700 text-center mb-6">
         Azure Cost Explorer
       </h1>
 
-      <div className="mb-4 flex gap-4 items-center">
-        <div className="flex items-center gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="flex flex-col space-y-2">
           <label className="text-blue-700 font-semibold">Service Family:</label>
           <select
             value={selectedFamily}
             onChange={(e) => setSelectedFamily(e.target.value)}
-            className="p-2 border border-blue-200 rounded shadow-sm focus:border-blue-400 focus:ring-1 focus:ring-blue-400 focus:outline-none bg-white"
+            className="p-2 border border-blue-200 rounded shadow-sm focus:border-blue-400 focus:ring-1 focus:ring-blue-400 focus:outline-none bg-white w-full"
           >
             {serviceFamilies.map(family => (
               <option key={family} value={family}>
@@ -130,24 +148,44 @@ export default function Home() {
             ))}
           </select>
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex flex-col space-y-2">
           <label className="text-blue-700 font-semibold">Savings Plan:</label>
           <select
             value={selectedSavingsPlan}
             onChange={(e) => setSelectedSavingsPlan(e.target.value)}
-            className="p-2 border border-blue-200 rounded shadow-sm focus:border-blue-400 focus:ring-1 focus:ring-blue-400 focus:outline-none bg-white"
+            className="p-2 border border-blue-200 rounded shadow-sm focus:border-blue-400 focus:ring-1 focus:ring-blue-400 focus:outline-none bg-white w-full"
           >
             <option value="all">All Items</option>
             <option value="with-savings">With Savings Plan</option>
             <option value="no-savings">Without Savings Plan</option>
           </select>
         </div>
-        <button 
-          onClick={clearFilters}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-sm transition duration-150"
-        >
-          Clear Filters
-        </button>
+
+        <div className="flex flex-col space-y-2">
+          <label className="text-blue-700 font-semibold opacity-0 hidden sm:block">Compare:</label>
+          <button 
+            onClick={handleCompare}
+            disabled={selectedRows.length < 2}
+            className={`p-2 ${
+              selectedRows.length < 2 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-blue-600 hover:bg-blue-700'
+            } text-white font-bold rounded shadow-sm transition duration-150 w-full h-[42px]`}
+          >
+            Compare ({selectedRows.length})
+          </button>
+        </div>
+
+        <div className="flex flex-col space-y-2">
+          <label className="text-blue-700 font-semibold opacity-0 hidden sm:block">Action:</label>
+          <button 
+            onClick={clearFilters}
+            className="p-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded shadow-sm transition duration-150 w-full h-[42px]"
+          >
+            Clear Filters
+          </button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -161,6 +199,7 @@ export default function Home() {
               <table className="min-w-full border-collapse">
                 <thead className="sticky top-0 z-10">
                   <tr>
+                    <th className="border-b border-x border-blue-200 p-2 w-20 bg-blue-600 text-white">S.No</th>
                     <th className="border-b border-x border-blue-200 p-2 min-w-[200px] bg-blue-600 text-white">Product Name</th>
                     <th className="border-b border-x border-blue-200 p-2 min-w-[200px] bg-blue-600 text-white">SKU</th>
                     <th className="border-b border-x border-blue-200 p-2 min-w-[150px] bg-blue-600 text-white">Location</th>
@@ -169,6 +208,7 @@ export default function Home() {
                     <th className="border-b border-x border-blue-200 p-2 min-w-[150px] bg-blue-600 text-white">Billing Type</th>
                   </tr>
                   <tr className="shadow-sm">
+                    <th className="border-b border-x p-2 bg-white"></th>
                     <th className="border-b border-x p-2 bg-white">
                       <input
                         type="text"
@@ -226,16 +266,32 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredData.length === 0 ? (
-                    <tr>
-                      <td colSpan="7" className="text-center py-4 border-b border-x border-blue-200 text-blue-600">
-                        No data found
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredData.map((item, index) => (
-                      <tr key={`${item.productName}-${index}`} className="hover:bg-blue-50">
-                        <td className="border-b border-x border-blue-200 p-2">{item.productName}</td>
+                  {(isCompareMode ? selectedRows : filteredData).map((item, index) => {
+                    const serialNumber = isCompareMode ? item.serialNumber : index + 1;
+                    const isSelected = selectedRows.some(row => row.serialNumber === serialNumber);
+                    
+                    return (
+                      <tr 
+                        key={serialNumber}
+                        onClick={() => handleRowSelect(item, serialNumber)}
+                        className={`hover:bg-blue-50 cursor-pointer ${
+                          isSelected ? 'bg-blue-100' : ''
+                        }`}
+                      >
+                        <td className="border-b border-x border-blue-200 p-2 text-center">
+                          <div className="flex items-center justify-center space-x-2">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleRowSelect(item, serialNumber)}
+                              className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                            />
+                            <span>{serialNumber}</span>
+                          </div>
+                        </td>
+                        <td className="border-b border-x border-blue-200 p-2">
+                          <span>{item.productName}</span>
+                        </td>
                         <td className="border-b border-x border-blue-200 p-2">{item.skuName}</td>
                         <td className="border-b border-x border-blue-200 p-2">{item.location}</td>
                         <td className="border-b border-x border-blue-200 p-2">
@@ -264,8 +320,8 @@ export default function Home() {
                         </td>
                         <td className="border-b border-x border-blue-200 p-2">{item.type}</td>
                       </tr>
-                    ))
-                  )}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

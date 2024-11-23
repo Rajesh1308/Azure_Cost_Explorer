@@ -130,7 +130,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-blue-50">
-      <div className="flex-grow p-4">
+      <div className="flex-grow p-4 pb-0">
         <h1 className="text-3xl font-bold text-blue-700 text-center mb-6">
           Azure Cost Explorer
         </h1>
@@ -195,7 +195,7 @@ export default function Home() {
             <div className="text-blue-600">Loading...</div>
           </div>
         ) : (
-          <div className="border border-blue-200 rounded-lg bg-white shadow-lg h-[calc(100vh-280px)]">
+          <div className="border border-blue-200 rounded-lg bg-white shadow-lg h-[calc(100vh-200px)]">
             <div className="overflow-x-auto h-full">
               <div className="h-full overflow-auto">
                 <table className="min-w-full border-collapse">
